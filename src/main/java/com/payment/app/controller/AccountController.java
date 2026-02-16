@@ -2,7 +2,6 @@ package com.payment.app.controller;
 
 import com.payment.app.dto.ResponseDto;
 import com.payment.app.service.AccountService;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -12,8 +11,11 @@ import jakarta.ws.rs.core.Response;
 @Path("/account")
 public class AccountController {
 
-    @Inject
-    AccountService service;
+    private final AccountService service;
+
+    public AccountController(AccountService service) {
+        this.service = service;
+    }
 
     @GET
     @Path("/{accountNo}")

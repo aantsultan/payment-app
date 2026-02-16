@@ -6,14 +6,16 @@ import com.payment.app.helper.ExceptionHelper;
 import com.payment.app.model.Account;
 import com.payment.app.repository.AccountRepositoryImpl;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class AccountServiceImpl implements AccountService {
 
-    @Inject
-    AccountRepositoryImpl repository;
+    private final AccountRepositoryImpl repository;
+
+    public AccountServiceImpl(AccountRepositoryImpl repository) {
+        this.repository = repository;
+    }
 
     @Override
     public Account findById(String accountNo) {

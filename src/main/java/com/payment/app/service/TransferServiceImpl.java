@@ -10,7 +10,6 @@ import com.payment.app.model.embedded.TransferId;
 import com.payment.app.repository.TransferRepositoryImpl;
 import io.quarkus.arc.Lock;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
@@ -18,11 +17,14 @@ import java.math.BigDecimal;
 @ApplicationScoped
 public class TransferServiceImpl implements TransferService {
 
-    @Inject
-    TransferRepositoryImpl repository;
+    private final TransferRepositoryImpl repository;
 
-    @Inject
-    AccountService accountService;
+    private final AccountService accountService;
+
+    public TransferServiceImpl(TransferRepositoryImpl repository, AccountService accountService) {
+        this.repository = repository;
+        this.accountService = accountService;
+    }
 
     @Override
     @Transactional

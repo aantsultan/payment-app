@@ -3,7 +3,6 @@ package com.payment.app.controller;
 import com.payment.app.dto.ResponseDto;
 import com.payment.app.dto.TransferDto;
 import com.payment.app.service.TransferService;
-import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -14,8 +13,11 @@ import jakarta.ws.rs.core.Response;
 @Path("/transfer")
 public class TransferController {
 
-    @Inject
-    TransferService service;
+    private final TransferService service;
+
+    public TransferController(TransferService service) {
+        this.service = service;
+    }
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
