@@ -59,4 +59,18 @@ public class AccountControllerTest {
         Assertions.assertEquals(DB_ACCOUNT, responseDto.getData().getAccountNo());
         Assertions.assertEquals(0, responseDto.getData().getBalance().compareTo(DB_BALANCE));
     }
+
+    @Test
+    void get_NotFound() throws JsonProcessingException {
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .get("/account/{accountNo}", "SALAH")
+                .thenReturn();
+        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, response.getStatusCode());
+        String contentAsString = response.prettyPrint();
+        ResponseDto<AccountDto> responseDto = objectMapper.readValue(contentAsString, new TypeReference<>() {
+        });
+        Assertions.assertNull(responseDto.getData());
+        Assertions.assertNotNull(responseDto.getError());
+    }
 }
