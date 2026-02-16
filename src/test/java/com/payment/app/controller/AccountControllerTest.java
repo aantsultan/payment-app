@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import static io.restassured.RestAssured.given;
 
 @QuarkusTest
-public class AccountControllerTest {
+class AccountControllerTest {
 
     private static final String DB_ACCOUNT = "1001";
     private static final BigDecimal DB_BALANCE = new BigDecimal("1000000.00");
