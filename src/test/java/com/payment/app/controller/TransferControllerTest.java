@@ -24,7 +24,7 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 
 @QuarkusTest
-public class TransferControllerTest {
+class TransferControllerTest {
 
     private static final String DB_ACCOUNT = "1001";
     private static final String CR_ACCOUNT = "1002";
@@ -105,6 +105,53 @@ public class TransferControllerTest {
         data = responseDtoAcc.getData();
         Assertions.assertEquals(CR_ACCOUNT, data.getAccountNo());
         Assertions.assertEquals(0, CR_BALANCE.add(AMOUNT).compareTo(data.getBalance()));
+    }
+
+    @Test
+    void transfer_DbAccountNotFound() throws Exception {
+        String code = UUID.randomUUID().toString();
+        TransferDto transferDto = new TransferDto();
+        transferDto.setDebitAccount("Salah");
+        transferDto.setCreditAccount(CR_ACCOUNT);
+        transferDto.setAmount(AMOUNT);
+        transferDto.setTransactionCode(code);
+        String request = objectMapper.writeValueAsString(transferDto);
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .post("/transfer")
+                .andReturn();
+        int status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_NOT_FOUND, status);
+        ResponseDto<String> responseDto = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        Assertions.assertNotNull(responseDto.getError());
+
+        // Check if balance DB Account still same
+        response = given()
+                .contentType(ContentType.JSON)
+                .get("/account/{accountNo}", DB_ACCOUNT)
+                .thenReturn();
+        status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_OK, status);
+        ResponseDto<AccountDto> responseDtoAcc = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        AccountDto data = responseDtoAcc.getData();
+        Assertions.assertEquals(DB_ACCOUNT, data.getAccountNo());
+        Assertions.assertEquals(0, DB_BALANCE.compareTo(data.getBalance()));
+
+        // Check if balance CR Account still same
+        response = given()
+                .contentType(ContentType.JSON)
+                .get("/account/{accountNo}", CR_ACCOUNT)
+                .thenReturn();
+        status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_OK, status);
+        responseDtoAcc = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        data = responseDtoAcc.getData();
+        Assertions.assertEquals(CR_ACCOUNT, data.getAccountNo());
+        Assertions.assertEquals(0, CR_BALANCE.compareTo(data.getBalance()));
     }
 
     @AfterEach
