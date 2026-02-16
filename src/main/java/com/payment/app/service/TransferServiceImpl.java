@@ -41,7 +41,14 @@ public class TransferServiceImpl implements TransferService {
         Transfer transfer = new Transfer();
         transfer.setTransferId(transferId);
         transfer.setAmount(amount);
-        repository.persistAndFlush(transfer);
+
+        try {
+            repository.persistAndFlush(transfer);
+        } catch (Exception e) {
+            if (e.getMessage().contains("Unique index or primary key violation")) {
+                throw new TransferException(ExceptionHelper.TRANSFER_DUPLICATE);
+            }
+        }
 
         // 2. update debit balance
         Account dbAccount = accountService.findById(debitAccount);
