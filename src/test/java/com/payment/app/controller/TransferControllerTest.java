@@ -201,6 +201,56 @@ class TransferControllerTest {
         Assertions.assertEquals(0, CR_BALANCE.compareTo(data.getBalance()));
     }
 
+    /**
+     * e. Saldo tidak bisa minus (-)
+     */
+    @Test
+    void transfer_NotMinus() throws Exception {
+        String code = UUID.randomUUID().toString();
+        TransferDto transferDto = new TransferDto();
+        transferDto.setDebitAccount(DB_ACCOUNT);
+        transferDto.setCreditAccount(CR_ACCOUNT);
+        transferDto.setAmount(LARGE_AMOUNT);
+        transferDto.setTransactionCode(code);
+        String request = objectMapper.writeValueAsString(transferDto);
+        Response response = given()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .post("/transfer")
+                .andReturn();
+        int status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_BAD_REQUEST, status);
+        ResponseDto<String> responseDto = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        Assertions.assertNotNull(responseDto.getError());
+
+        // 1. Check if balance DB Account still same
+        response = given()
+                .contentType(ContentType.JSON)
+                .get("/account/{accountNo}", DB_ACCOUNT)
+                .thenReturn();
+        status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_OK, status);
+        ResponseDto<AccountDto> responseDtoAcc = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        AccountDto data = responseDtoAcc.getData();
+        Assertions.assertEquals(DB_ACCOUNT, data.getAccountNo());
+        Assertions.assertEquals(0, DB_BALANCE.compareTo(data.getBalance()));
+
+        // 2. Check if balance CR Account still same
+        response = given()
+                .contentType(ContentType.JSON)
+                .get("/account/{accountNo}", CR_ACCOUNT)
+                .thenReturn();
+        status = response.getStatusCode();
+        Assertions.assertEquals(HttpStatus.SC_OK, status);
+        responseDtoAcc = objectMapper.readValue(response.getBody().prettyPrint(), new TypeReference<>() {
+        });
+        data = responseDtoAcc.getData();
+        Assertions.assertEquals(CR_ACCOUNT, data.getAccountNo());
+        Assertions.assertEquals(0, CR_BALANCE.compareTo(data.getBalance()));
+    }
+
     @AfterEach
     void deleteAccount() {
         accountService.deleteAll();
