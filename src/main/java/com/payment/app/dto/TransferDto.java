@@ -1,19 +1,13 @@
-package com.payment.app.model.embedded;
+package com.payment.app.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import java.math.BigDecimal;
 
-import java.io.Serializable;
+public class TransferDto {
 
-@Embeddable
-public class TransferId implements Serializable {
-
-    @Column(name = "debit_account")
     private String debitAccount;
-    @Column(name = "credit_account")
     private String creditAccount;
-    @Column(name = "transaction_code")
     private String transactionCode;
+    private BigDecimal amount;
 
     public String getDebitAccount() {
         return debitAccount;
@@ -37,5 +31,13 @@ public class TransferId implements Serializable {
 
     public void setTransactionCode(String transactionCode) {
         this.transactionCode = transactionCode;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 }
